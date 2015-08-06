@@ -17,7 +17,34 @@ Actually this function combines two ways of computing the treemap: equal weight 
 [Explore](http://prjcts.sebastianmeier.eu/nmap/examples/) the training data sets.
 
 ## Documentation
+```
+d3.csv("../data/configuration01.csv", function(error, data) {
 
+	//Creating an array of nmap_element objects
+	var elements = [];
+	for(var i = 0; i<data.length; i++){
+		elements.push(new nmap_element({
+			id:data[i].id,
+			x:data[i].x,
+			y:data[i].y,
+			weight:(("weight" in data[i]) ? data[i].weight : 1),
+			klass:(("class" in data[i]) ? data[i].class : 1)
+		}));
+	}
+
+	//initializing the nmap function and setting the bounding box
+	var map = new nmap({x:0, y:0, width:500, height:300});
+
+	//NMap Alternate Cut Approach
+	var ac = map.alternateCut({elements:elements});
+	console.log(ac);
+
+	//Equal Weight Approach
+	var ew = map.equalWeight({elements:elements});
+	console.log(ew);
+	
+});
+```
 If want to know more about the algorithm take a look at the documentation in this repository.
 
 ## References
