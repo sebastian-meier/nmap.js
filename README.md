@@ -18,6 +18,7 @@ Actually this function combines two ways of computing the treemap: equal weight 
 
 ## Documentation
 ```
+//Load a dataset
 d3.csv("../data/configuration01.csv", function(error, data) {
 
 	//Creating an array of nmap_element objects
@@ -37,11 +38,11 @@ d3.csv("../data/configuration01.csv", function(error, data) {
 
 	//NMap Alternate Cut Approach
 	var ac = map.alternateCut({elements:elements});
-	console.log(ac);
 
 	//Equal Weight Approach
 	var ew = map.equalWeight({elements:elements});
-	console.log(ew);
+
+	//you can then use either ac or ew two draw/generate the treemap with e.g. d3
 	
 });
 ```
