@@ -1,0 +1,114 @@
+<html>
+<head>
+	<style type="text/css">
+		svg{
+			width:850px;
+			height:400px;
+		}
+
+		rect{
+			stroke:red;
+			stroke-width:0.2;
+			shape-rendering:cripsEdges;
+		}
+	</style>
+	<script type="text/javascript" src="../lib/affinetransform.js"></script>
+	<script type="text/javascript" src="../nmap.min.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+<body>
+	<select id="dataset">
+		<option value="../data/configuration01.csv" selected="selected">Config #1</option>
+		<option value="../data/configuration02.csv">Config #2</option>
+		<option value="../data/configuration03.csv">Config #3</option>
+		<option value="../data/configuration04.csv">Config #4</option>
+		<option value="../data/configuration05.csv">Config #5</option>
+		<option value="../data/configuration06.csv">Config #6</option>
+		<option value="../data/configuration07.csv">Config #7</option>
+		<option value="../data/configuration08.csv">Config #8</option>
+		<option value="../data/configuration09.csv">Config #9</option>
+		<option value="../data/londonBoroughs.csv">London Boroughs</option>
+	</select>
+	<select id="mode">
+		<option value="equal" selected="selected">Equal Weight</option>
+		<option value="alternate">Alternate Cut</option>
+	</select><br />
+	<svg id="svg" width="850", height="400"></svg>
+	<script type="text/javascript">
+
+	var file = "../data/configuration01.csv";
+	var mode = "equal";
+
+	function buildMap(){
+		d3.csv(file, function(error, data) {
+			var max_weight = d3.max(data, function(d){
+				return d.weight;
+			});
+
+			var elements = [];
+			for(var i = 0; i<data.length; i++){
+				elements.push(new nmap_element({
+					id:data[i].id,
+					x:data[i].x,
+					y:data[i].y,
+					weight:(("weight" in data[i]) ? data[i].weight : 1),
+					klass:(("class" in data[i]) ? data[i].class : 1)
+				}));
+			}
+
+			var map = new nmap({x:250, y:10, width:580, height:380});
+
+			if(mode == "alternate"){
+				//NMap Alternate Cut Approach
+				var ac = map.alternateCut({elements:elements});
+			}else{
+				//Equal Weight Approach
+				var ac = map.equalWeight({elements:elements});
+			}
+
+			d3.select("#svg g.nmap").remove();
+
+			d3.select("#svg").append("g").attr("class", "nmap").selectAll("rect")
+				.data(ac).enter().append("rect")
+					.attr("x", function(d){ return d.attr().x })
+					.attr("y", function(d){ return d.attr().y })
+					.attr("fill", function(d){ return "rgba(50,50,"+Math.round(parseFloat(d.attr().element.attr().klass)*255)+",1)" })
+					//.attr("fill", function(d){ return "rgba(0,0,0,"+d.attr().element.attr().weight/max_weight+")" })
+					.attr("width", function(d){ return d.attr().width })
+					.attr("height", function(d){ return d.attr().height });
+
+			d3.select("#svg g.points").remove();
+
+			var maxx = d3.max(data, function(d){return parseFloat(d.x);});
+			var minx = d3.min(data, function(d){return parseFloat(d.x);});
+			var maxy = d3.max(data, function(d){return parseFloat(d.y);});
+			var miny = d3.min(data, function(d){return parseFloat(d.y);});
+
+			d3.select("#svg").append("g").attr("class", "points").attr("transform", "translate(10 10)").selectAll("circle")
+				.data(data).enter().append("circle")
+					.attr("r", 2)
+					.attr("cx", function(d){ return (d.x-minx)/(maxx-minx)*200; })
+					.attr("cy", function(d){ return (d.y-miny)/(maxy-miny)*200; })
+					.attr("fill", function(d){ return "rgba(50,50,"+Math.round(parseFloat(d.class)*255)+",1)" });
+
+		});
+	}
+
+	buildMap();
+
+	d3.select("#dataset").on("change", function(){
+		var sel = document.getElementById('dataset');
+		file = sel.options[sel.selectedIndex].value;
+		buildMap();
+	});
+
+	d3.select("#mode").on("change", function(){
+		var sel = document.getElementById('mode');
+		mode = sel.options[sel.selectedIndex].value;
+		buildMap();
+	});
+
+	</script>
+
+</body>
+</html>
