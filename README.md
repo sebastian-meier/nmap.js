@@ -12,6 +12,17 @@ Important Notice: This is not a D3 plugin or widget, this is a standalone set of
 
 Actually this function combines two ways of computing the treemap: equal weight approach and alternating cut approach. If you want two know more about the differences i suggest you look at their publication (see below) or look at the code.
 
+## Important Notice
+
+I found out that the algorithm breaks if the weight is the same for all elements, but there is an easy way around it:
+
+```
+[...]
+weight:1000+Math.random()
+[...]
+```
+Using the above code will make sure the algorithm works fine, but you will see no visual difference.
+
 ## Example
 
 [Explore](http://prjcts.sebastianmeier.eu/nmap/examples/) the training data sets.
