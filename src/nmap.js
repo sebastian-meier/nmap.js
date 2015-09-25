@@ -76,10 +76,30 @@ var nmap = function(args){
 				miny = Math.min(miny, elements[i].getY());
 			}
 
+			//REMOVE ???
+			if(!isFinite(maxx)){maxx=0;}
+			if(!isFinite(maxy)){maxy=0;}
+			if(!isFinite(minx)){minx=0;}
+			if(!isFinite(miny)){miny=0;}
+
 			//normalize the pints by the given max/min values in relation to the bounding box of the treemap
 			for(i = 0; i<elements.length; i++){
-				elements[i].setX((((elements[i].getX() - minx)/(maxx - minx))*(attr.visualSpace.attr().width)) + attr.visualSpace.attr().x);
-				elements[i].setY((((elements[i].getY() - miny)/(maxy - miny))*(attr.visualSpace.attr().height)) + attr.visualSpace.attr().y);
+				var tx;
+				if((maxx-minx)===0){
+					tx = 0;
+				}else{
+					tx = (((elements[i].getX() - minx)/(maxx - minx))*(attr.visualSpace.attr().width)) + attr.visualSpace.attr().x;
+				}
+
+				var ty;
+				if((maxy-miny)===0){
+					ty = 0;
+				}else{
+					ty = (((elements[i].getY() - miny)/(maxy - miny))*(attr.visualSpace.attr().height)) + attr.visualSpace.attr().y;
+				}
+
+				elements[i].setX(tx);
+				elements[i].setY(ty);
 			}
 		}
 
@@ -263,12 +283,14 @@ var nmap = function(args){
 				var hRb = (pB / (pA + pB)) * cut_attr.visualSpace.attr().height;
 
 				var bv = (Da[Da.length - 1].getY() + Db[0].getY()) / 2;
+				var RaHeight = bv - cut_attr.visualSpace.attr().y;
+				if(RaHeight===0){RaHeight = 1;}
 
 				Ra = new nmap_boundingbox({
 					x : cut_attr.visualSpace.attr().x,
 					y : cut_attr.visualSpace.attr().y,
 					width: cut_attr.visualSpace.attr().width,
-					height:bv - cut_attr.visualSpace.attr().y
+					height:RaHeight
 				});
 
 				Rb = new nmap_boundingbox({
